@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect } from 'react';
 import InputPanel from './components/InputPanel';
 import OutputPanel from './components/OutputPanel';
@@ -16,20 +15,23 @@ const App: React.FC = () => {
   const parseQuiz = (rawText: string): QuizData => {
     const [questionsPart, answersPart] = rawText.split(/---/);
     const questions = [];
-    const questionRegex = /(\d+)\.\s(.*?)\na\)\s(.*?)\nb\)\s(.*?)\nc\)\s(.*?)\nd\)\s(.*?)(?=\n\d+\.|\n*$)/gs;
+    // This regex is more robust to handle variations in whitespace and option formatting (e.g., "a)" or "a.")
+    const questionRegex = /(\d+)\.\s(.*?)\s*a[.)]\s(.*?)\s*b[.)]\s(.*?)\s*c[.)]\s(.*?)\s*d[.)]\s(.*?)(?=\s*\d+\.|\s*$)/gs;
 
     let match;
-    while ((match = questionRegex.exec(questionsPart)) !== null) {
-      questions.push({
-        number: parseInt(match[1]),
-        question: match[2].trim(),
-        options: [
-          `a) ${match[3].trim()}`,
-          `b) ${match[4].trim()}`,
-          `c) ${match[5].trim()}`,
-          `d) ${match[6].trim()}`,
-        ],
-      });
+    if (questionsPart) {
+      while ((match = questionRegex.exec(questionsPart)) !== null) {
+        questions.push({
+          number: parseInt(match[1]),
+          question: match[2].trim(),
+          options: [
+            `a) ${match[3].trim()}`,
+            `b) ${match[4].trim()}`,
+            `c) ${match[5].trim()}`,
+            `d) ${match[6].trim()}`,
+          ],
+        });
+      }
     }
 
     const answers = answersPart
