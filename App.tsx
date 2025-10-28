@@ -10,7 +10,8 @@ const App: React.FC = () => {
   const [outputType, setOutputType] = useState<OutputType>('welcome');
   const [outputContent, setOutputContent] = useState<string | QuizData | FlashcardData[] | null>(null);
   const [mainTopic, setMainTopic] = useState<string | null>(null);
-  const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(null);
+  // Fix: Replace NodeJS.Timeout with ReturnType<typeof setTimeout> for browser compatibility.
+  const [debounceTimeout, setDebounceTimeout] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   const parseQuiz = (rawText: string): QuizData => {
     const [questionsPart, answersPart] = rawText.split(/---/);
@@ -134,6 +135,12 @@ const App: React.FC = () => {
       }
     };
   }, [debounceTimeout]);
+  
+  const handleFileUploadError = (message: string) => {
+    setOutputType('error');
+    setOutputContent(message);
+    setIsLoading(false);
+  };
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 font-sans p-4 sm:p-6 lg:p-8">
@@ -151,6 +158,7 @@ const App: React.FC = () => {
             onTextChange={handleTextChange}
             onCommandClick={handleCommandClick}
             isLoading={isLoading}
+            onFileUploadError={handleFileUploadError}
           />
           <OutputPanel
             isLoading={isLoading}
